@@ -1,41 +1,29 @@
 var 
 	element = document.getElementById('square'),
 	wrapper = document.getElementById('wrapper'),
-	elementWidth = element.offsetWidth,
-	wrapperWidth = wrapper.offsetWidth,
-	maxOffsetX = elementWidth / 2,
-	minOffsetX = wrapperWidth - elementWidth,
-
-	elementHeight = element.offsetHeight,
-	wrapperHeight = wrapper.offsetHeight,
-	maxOffsetY = elementHeight / 2,
-	minOffsetY = wrapperHeight - elementHeight,
-
-	wrapperEdges = getEdges(wrapper);
+	wrapperEdges = getEdges(wrapper),
+	elementEdges = getEdges(element),
+	elemWidth = element.naturalWidth,
+	elemHeight = element.naturalHeight,
+	rightEdge = wrapper.clientWidth - elemWidth,
+	bottomEdge = wrapper.clientHeight - elemHeight,
+	wrapperRigt;
 
 element.onmousedown = function(e) {
-	
+	var 
+		clickPosX = e.pageX,
+		clickPosY = e.pageY;
+
 	document.onmousemove = function(e) {
 		var 
-			shiftX = e.pageX - wrapperEdges.left,
-			shiftY = e.pageY;
-	
-		if (shiftX > maxOffsetX) {
-			shiftX = maxOffsetX;
-		} else if (shiftX < minOffsetX){
-			shiftX = minOffsetX;
-		}
+			shiftX = -(clickPosX - e.pageX),
+			shiftY = -(clickPosY - e.pageY);
+			
+		shiftX = checkPosImg(shiftX, {first: 0, second: rightEdge});
+		shiftY = checkPosImg(shiftY, {first: 0, second: bottomEdge});
 
-		if (shiftY > maxOffsetY) {
-			shiftY = maxOffsetY;
-		} else if (shiftY < minOffsetY){
-			shiftY = minOffsetY;
-		}
-
-		element.style.left = shiftX - elementWidth/2 + "px";
-		element.style.top = shiftY - wrapperHeight/2 + "px";
-
-		console.log(shiftX);
+		element.style.left = shiftX + 'px';
+		element.style.top = shiftY + 'px';
 	}
 
 	document.onmouseup = function() {
@@ -47,6 +35,15 @@ element.onmousedown = function(e) {
 element.ondragstart = function() {
   return false;
 };
+
+function checkPosImg(currentPos, edges) {
+	if (currentPos > edges.first) {
+		return edges.first;
+	} else if (currentPos < edges.second) {
+		return edges.second;
+	}
+	return currentPos;
+}
 
 function getEdges(elem) {
 	var box = elem.getBoundingClientRect();
